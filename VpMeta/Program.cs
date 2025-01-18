@@ -10,16 +10,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.Configure<FormOptions>(x => {
-    long val = x.MultipartBodyLengthLimit;
-    if (long.TryParse(builder.Configuration["MaxUploadLimit"], out val))
-        x.MultipartBodyLengthLimit = val;
+    x.MultipartBodyLengthLimit = builder.Configuration.GetValue("MaxUploadLimit", x.MultipartBodyLengthLimit);
 });
 
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 //builder.Services.AddDbContext<ClinicalTrialMetadataRepository>(opt => opt.UseInMemoryDatabase("ClinicalTrialMetadata") );
-builder.Services.AddDbContext<ClinicalTrialMetadataRepository>(opt => opt.UseSqlite(builder.Configuration["ConnectionStrings:SQLiteDefault"]));
+builder.Services.AddDbContext<ClinicalTrialMetadataRepository>(opt => opt.UseSqlite(builder.Configuration["Db:ConnectionString"]));
 builder.Services.AddSingleton<IJsonParserWithValidation>(new NJsonParser(schemaStream));
 builder.Services.AddScoped<ClinicalTrialMetadataService, ClinicalTrialMetadataService>();
 builder.Services.AddControllers();
@@ -35,7 +33,31 @@ builder.Services.AddHttpLogging(logging =>
 
 
 var app = builder.Build();
+
+if (builder.Configuration.GetValue("Migration", false))
+{
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ClinicalTrialMetadataRepository>();
+
+    // Check and apply pending migrations
+    var pendingMigrations = dbContext.Database.GetPendingMigrations();
+    if (pendingMigrations.Any())
+    {
+        Console.WriteLine("Applying pending migrations...");
+        dbContext.Database.Migrate();
+        Console.WriteLine("Migrations applied successfully.");
+    }
+    else
+    {
+        Console.WriteLine("No pending migrations found.");
+    }
+    Console.WriteLine("Exiting...");
+    return;
+}
+
 app.UseHttpLogging();
+
+
 
 
 // Configure the HTTP request pipeline.
