@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
-using Microsoft.EntityFrameworkCore;
 
 namespace VpMeta.Models;
 
@@ -13,9 +12,9 @@ public enum ClinicalTrialStatus {
     Completed
 }
 
-[PrimaryKey("TrialId")]
 public class ClinicalTrialMetadata
 {
+    [Key]
     public required string TrialId { get; set; }
     public required string Title { get; set; }
     public required DateOnly StartDate { get; set; }

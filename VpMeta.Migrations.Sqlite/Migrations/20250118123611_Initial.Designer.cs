@@ -8,10 +8,10 @@ using VpMeta.Repositories;
 
 #nullable disable
 
-namespace vpmeta.Migrations
+namespace VpMeta.Migrations.Sqlite.Migrations
 {
     [DbContext(typeof(ClinicalTrialMetadataRepository))]
-    [Migration("20250117125902_Initial")]
+    [Migration("20250118123611_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
