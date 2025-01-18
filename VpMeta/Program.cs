@@ -16,8 +16,23 @@ builder.Services.Configure<FormOptions>(x => {
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-//builder.Services.AddDbContext<ClinicalTrialMetadataRepository>(opt => opt.UseInMemoryDatabase("ClinicalTrialMetadata") );
-builder.Services.AddDbContext<ClinicalTrialMetadataRepository>(opt => opt.UseSqlite(builder.Configuration["Db:ConnectionString"]));
+
+
+builder.Services.AddDbContext<ClinicalTrialMetadataRepository>(
+    opt => _ = builder.Configuration.GetValue("Db:Type", "SqLite")?.ToLower() switch 
+    {
+        "memory" => opt.UseInMemoryDatabase("ClinicalTrialMetadata"),
+        "sqlite" => opt.UseSqlite(
+            builder.Configuration["Db:ConnectionString"],
+            x => x.MigrationsAssembly("VpMeta.Migrations.Sqlite")
+        ),
+        "mssql" => opt.UseSqlServer(
+            builder.Configuration["Db:ConnectionString"],
+            x => x.MigrationsAssembly("VpMeta.Migrations.SqlServer")
+        ),
+        _ => throw new Exception($"Unsupported provider: {builder.Configuration.GetValue("Db:Type", "SqLite")}")
+    });
+
 builder.Services.AddSingleton<IJsonParserWithValidation>(new NJsonParser(schemaStream));
 builder.Services.AddScoped<ClinicalTrialMetadataService, ClinicalTrialMetadataService>();
 builder.Services.AddControllers();

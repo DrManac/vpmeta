@@ -5,7 +5,7 @@ namespace VpMeta.Tests.Unit;
 public class JsonValidationTest
 {
     public JsonValidationTest() {
-        var stream = typeof(NJsonParser).Assembly.GetManifestResourceStream("vpmeta.schema.json") ?? throw new Exception("Missing schema resource");
+        var stream = typeof(NJsonParser).Assembly.GetManifestResourceStream("VpMeta.schema.json") ?? throw new Exception("Missing schema resource");
         parser = new NJsonParser(stream);
     }
     readonly IJsonParserWithValidation parser;

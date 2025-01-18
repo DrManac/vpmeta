@@ -16,9 +16,17 @@
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.1" />
     <PackageReference Include="NJsonSchema" Version="11.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     <EmbeddedResource Include="schema.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VpMeta.Domain\VpMeta.Domain.csproj" />
+    <ProjectReference Include="..\VpMeta.Infrastructure\VpMeta.Infrastructure.csproj" />
+    <ProjectReference Include="..\VpMeta.Migrations.Sqlite\VpMeta.Migrations.Sqlite.csproj" />
+    <ProjectReference Include="..\VpMeta.Migrations.SqlServer\VpMeta.Migrations.SqlServer.csproj" />
   </ItemGroup>
 
 </Project>

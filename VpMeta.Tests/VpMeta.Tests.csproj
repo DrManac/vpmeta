@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\VpMeta\vpmeta.csproj" />
+    <ProjectReference Include="..\VpMeta\VpMeta.csproj" />
   </ItemGroup>
 
 </Project>
