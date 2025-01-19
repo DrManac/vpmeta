@@ -27,6 +27,7 @@ public class ClinicalTrialMetadataController(
         return await ProcessStringData(str);
     }
     [HttpPost]
+    [OverrideSchema]
     public async Task<ActionResult> PostSingle()
     {
         var str = await Request.GetRawBodyAsync();

@@ -22,5 +22,5 @@ public class ClinicalTrialMetadata
     [Range(1, int.MaxValue)]
     public int? Participants { get; set; }
     public required ClinicalTrialStatus Status { get; set; }
-    public int? Duration { get; set; }
+    public int Duration { get; set; }
 }

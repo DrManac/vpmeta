@@ -37,7 +37,7 @@ public class DataTransformTest
             Status = ClinicalTrialStatus.Completed
         };
         ClinicalTrialMetadataService.Transform(md);
-        Assert.Equal(md.Duration, 28);
+        Assert.Equal(28, md.Duration);
         Assert.Equal(ClinicalTrialStatus.Ongoing, md.Status);
         Assert.True(md.EndDate.HasValue);
         Assert.Equal(md.EndDate, md.StartDate.AddMonths(1));

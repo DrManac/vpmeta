@@ -15,7 +15,10 @@ builder.Services.Configure<FormOptions>(x => {
 
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c => {
+    c.OperationFilter<OverrideSchemaOperationFilter>();
+    c.SupportNonNullableReferenceTypes();
+});
 
 
 builder.Services.AddDbContext<ClinicalTrialMetadataRepository>(
