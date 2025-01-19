@@ -112,6 +112,7 @@ public class ClinicalTrialMetadataController(
     [HttpGet]
     [Route("{id}")]
     [ProducesResponseType(typeof(ClinicalTrialMetadata), 200)]
+    [ProducesResponseType(404)]
     [ProducesResponseType(typeof(string), 503)]
     public async Task<ActionResult<ClinicalTrialMetadata>> Get(string id)
     {
