@@ -79,7 +79,7 @@ app.UseHttpLogging();
 
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || builder.Configuration.GetValue("EnableSwagger", false))
 {
     app.UseSwagger();
     app.UseSwaggerUI();

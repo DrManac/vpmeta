@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc;
 using VpMeta.Application;
 using VpMeta.Models;
@@ -17,6 +18,11 @@ public class ClinicalTrialMetadataController(
 
     [HttpPost]
     [Route("upload")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(typeof(string), 400)]
+    [ProducesResponseType(typeof(string), 409)]
+    [ProducesResponseType(typeof(string[]), 422)] 
+    [ProducesResponseType(typeof(string), 503)]
     public async Task<ActionResult> PostFile(IFormFile file)
     {
         //Accept only files with a .json extension
@@ -26,8 +32,14 @@ public class ClinicalTrialMetadataController(
         var str = await reader.ReadToEndAsync();
         return await ProcessStringData(str);
     }
+
     [HttpPost]
     [OverrideSchema]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(typeof(string), 400)]
+    [ProducesResponseType(typeof(string), 409)]
+    [ProducesResponseType(typeof(string[]), 422)] 
+    [ProducesResponseType(typeof(string), 503)]
     public async Task<ActionResult> PostSingle()
     {
         var str = await Request.GetRawBodyAsync();
@@ -36,28 +48,39 @@ public class ClinicalTrialMetadataController(
 
     private async Task<ActionResult> ProcessStringData(string str)
     {
+        JsonNode json;
         try
         {
-            var json = parser.Parse(str);
-            await service.Create(json);
-            return Created();
+            json = parser.Parse(str);
         }
         catch (ApiValidationException e)
         {
             return UnprocessableEntity(e.Errors);
         }
-        catch (DuplicateKeyException)
-        {
-            return Conflict("Resource already exists");
-        }
         catch
         {
             return BadRequest("Invalid JSON content");
         }
+        try 
+        {
+            await service.Create(json);
+            return Created();
+        }
+        catch (DuplicateKeyException)
+        {
+            return Conflict("Resource already exists");
+        }
+        catch 
+        {
+            return StatusCode(503, "DB is unavailable");
+        }
+
     }
 
     [HttpGet]
-    public async Task<IEnumerable<ClinicalTrialMetadata>> GetAll(
+    [ProducesResponseType(typeof(IEnumerable<ClinicalTrialMetadata>), 200)]
+    [ProducesResponseType(typeof(string), 503)]
+    public async Task<ActionResult<IEnumerable<ClinicalTrialMetadata>>> GetAll(
         int? start,
         int? limit,
         ClinicalTrialStatus? status,
@@ -67,25 +90,40 @@ public class ClinicalTrialMetadataController(
         DateOnly? endedAfter
         )
     {
-        return await service.Select(new()
+        try {
+            return Ok(await service.Select(new()
+            {
+                Start = start,
+                Limit = limit,
+                Status = status,
+                StartedBefore = startedBefore,
+                StartedAfter = startedAfter,
+                EndedBefore = endedBefore,
+                EndedAfter = endedAfter
+            }));
+        }
+        catch 
         {
-            Start = start,
-            Limit = limit,
-            Status = status,
-            StartedBefore = startedBefore,
-            StartedAfter = startedAfter,
-            EndedBefore = endedBefore,
-            EndedAfter = endedAfter
-        });
+            return StatusCode(503, "DB is unavailable");
+        }
+
     }
 
     [HttpGet]
     [Route("{id}")]
+    [ProducesResponseType(typeof(ClinicalTrialMetadata), 200)]
+    [ProducesResponseType(typeof(string), 503)]
     public async Task<ActionResult<ClinicalTrialMetadata>> Get(string id)
     {
-        var res = await service.FindById(id);
-        if (res == null) return NotFound();
-        return res;
+        try {
+            var res = await service.FindById(id);
+            if (res == null) return NotFound();
+            return res;
+        }
+        catch 
+        {
+            return StatusCode(503, "DB is unavailable");
+        }
     }
 }
 
