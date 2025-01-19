@@ -22,7 +22,7 @@ namespace VpMeta.Migrations.Sqlite.Migrations
                     b.Property<string>("TrialId")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("Duration")
+                    b.Property<int>("Duration")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateOnly?>("EndDate")
